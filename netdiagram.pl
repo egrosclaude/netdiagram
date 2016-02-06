@@ -100,6 +100,41 @@ sub getTree {
 }	
 
 #-------------------------------------------------
+package Layout::SeqStack;
+
+sub print {
+	my ($self) = shift;
+	@{$self}[0]->print;
+	@{$self}[2]->print;
+}
+
+sub getLimInf {
+	my ($self) = shift;
+	return @{$self}[0]->getValue =~ /(\d+)/;
+}
+
+sub getLimSup {
+	my ($self) = shift;
+	return @{$self}[2]->getValue =~ /(\d+)/;
+}
+
+sub getValue {
+	return "/";
+}
+
+sub getTree {
+	my ($self) = shift;
+	my $root = shift;
+	my $t = Tree::Simple->new($self->getValue, $root);
+	my ($inf, $sup) = ($self->getLimInf, $self->getLimSup);
+	my $i;
+	for($i = $inf; $i <= $sup; $i++) {
+		$t->addChild(Tree::Simple->new(sprintf("H%d", $i)));
+	}
+	return $t;
+}	
+
+#-------------------------------------------------
 package main;
 use Marpa::R2;
 use Tree::Simple;
@@ -111,6 +146,7 @@ Layout ::=
 	  ('(') Layout (')') 	action => ::first
 	| Block  		bless => Block
 	| Layout '..' Layout 	bless => SeqArray 
+	| Layout '//' Layout 	bless => SeqStack
 	| Layout ',' Layout 	bless => Array
 	| Layout '/' Layout 	bless => Stack
 Block ~ [[:alpha:]] <zero or more digits>
@@ -236,7 +272,8 @@ sub draw {
 	makeCoords($t,$img,0,0);
 	lines2img($t,$img);
 	nodes2img($t, $img);
-	$img->font("Helvetica:Bold");
+	$img->bgcolor(200,200,200);
+	$img->font("Noto Sans:bold");
 	$img->fontsize(18);
 	$img->fgcolor(0,0,0);
 	labels2img($t,$img);
@@ -293,7 +330,7 @@ sub nodes2img {
 		$img->copy($t->{img}, $x - $w/2, $y - $h/2, 0, 0, $w, $h);
 	} else {
 		foreach my $c ($t->getAllChildren) {
-				nodes2img($c, $img);
+			nodes2img($c, $img);
 		}
 	}
 }
@@ -304,11 +341,11 @@ sub labels2img {
 	if($t->isLeaf) {
 		my ($x, $y) = @{$coords->{$t->getNodeValue}};
 		my ($w, $h) = ($t->{img}->width,$t->{img}->height);
-		$img->moveTo($x - 24, $y + 40);
+		$img->moveTo($x - 20, $y + 40);
 		$img->string($t->getNodeValue);
 	} else {
 		foreach my $c ($t->getAllChildren) {
-				labels2img($c, $img);
+			labels2img($c, $img);
 		}
 	}
 }
