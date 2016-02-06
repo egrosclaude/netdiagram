@@ -19,7 +19,11 @@ Links from a router to a switch, and from the switch to one host. Then, the rout
 
 ./netdiagram.pl "R1-S1;S1-H1;R1/S1/H1" > test1.png
 
-See https://github.com/egrosclaude/netdiagram/blob/master/test4.png: 
+Same as before but add a second host to S1:
+
+./netdiagram.pl "R1-S1;S1-H1;S1-H2;R1/S1/(H1,H2)" > test1b.png
+
+See https://github.com/egrosclaude/netdiagram/blob/master/test4.png for the following example: 
 
 ./netdiagram.pl "S1-H1..H7; S1-R1; R1-S2; S2-H8..H15; ((H1//H7),S1),R1,(S2,(H8//H15))" > test4.png
 
